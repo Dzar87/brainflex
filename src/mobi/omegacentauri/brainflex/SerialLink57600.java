@@ -13,18 +13,17 @@ import jssc.SerialPort;
 import jssc.SerialPortException;
 
 public class SerialLink57600 extends SerialDataLink {
-	// connect to 57600 baud
+    // connect to 57600 baud
 
-	public SerialLink57600(String port) throws Exception {
-		super(port);
-		baud = 57600;
-	}
+    public SerialLink57600(String port) throws Exception {
+        super(port);
+        baud = 57600;
+    }
 
-	public int getFixedBaud() {
-		return 57600;
-	}
+    public int getFixedBaud() {
+        return 57600;
+    }
 
-	@Override
-	protected void setBaud(int baud) {
-	}
+    @Override
+    protected void setBaud(int baud) {}
 }
