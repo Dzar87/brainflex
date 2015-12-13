@@ -42,62 +42,60 @@ public class SoundThread extends Thread {
     @Override
     public void run() {
         // Should really do a check if the file exists or not. Very dirty...
-        if (this.clip != null) {
-            this.gainControl = (FloatControl) this.clip.getControl(FloatControl.Type.MASTER_GAIN);
-            this.clip.loop(Clip.LOOP_CONTINUOUSLY);
-            float max_limit = this.gainControl.getMaximum();
-            float min_limit = this.gainControl.getMinimum();
-            //System.out.println("MAX " + max_limit);
-            //System.out.println("MIN " + min_limit);
-            // check limit are within bounds
-            if (this.min < min_limit) {
-                this.min = min_limit;
-            }
-            if (this.max > max_limit) {
-                this.max = max_limit;
-            }
-            if (this.step <= 0.0) {
-                this.step = 2.50f;
-            }
-            if (this.step >= 10.0) {
-                this.step = 10.0f;
-            }
-            // Start volume from min
-            float volume = this.min;
-            this.gainControl.setValue(volume);
-            this.clip.start();
-            System.out.println(this.clip.isRunning());
-            while (!this.done) {
-                synchronized (this) {
-                    if (this.meditation > this.attention && this.meditation > this.meditationThreshold) {
-                        System.out.println("MEDITATING**MEDITATING**MEDITATING**MEDITATING**");
-                        volume += this.step;
-                        if (volume >= this.max) {
-                            this.gainControl.setValue(this.max);
-                            volume = this.max;
-                        }
-                        else
-                            this.gainControl.setValue(volume);
-                    }
-                    else if (this.attention > this.meditation && this.attention > this.attentionThreshold) {
-                        System.out.println("ATTENTION**ATTENTION**ATTENTION**ATTENTION**");
-                        volume -= this.step;
-                        if (volume <= this.min) {
-                            this.gainControl.setValue(this.min);
-                            volume = this.min;
-                        }
-                        else
-                            this.gainControl.setValue(volume);
-                    }
+        if (this.clip == null) {
+            return;
+        }
+        this.gainControl = (FloatControl) this.clip.getControl(FloatControl.Type.MASTER_GAIN);
+        this.clip.loop(Clip.LOOP_CONTINUOUSLY);
+        float max_limit = this.gainControl.getMaximum();
+        float min_limit = this.gainControl.getMinimum();
+        //System.out.println("MAX " + max_limit);
+        //System.out.println("MIN " + min_limit);
+        // check limits are within bounds
+        if (this.min < min_limit) {
+            this.min = min_limit;
+        }
+        if (this.max > max_limit) {
+            this.max = max_limit;
+        }
+        if (this.step <= 0.0) {
+            this.step = 2.50f;
+        }
+        if (this.step >= 10.0) {
+            this.step = 10.0f;
+        }
+        // Start volume from min
+        float volume = this.min;
+        this.gainControl.setValue(volume);
+        this.clip.start();
+        System.out.println(this.clip.isRunning());
+        while (!this.done) {
+            synchronized (this) {
+                if (this.meditation > this.attention && this.meditation > this.meditationThreshold) {
+                    System.out.println("MEDITATING**MEDITATING**MEDITATING**MEDITATING**");
+                    volume += this.step;
+                    if (volume >= this.max) {
+                        this.gainControl.setValue(this.max);
+                        volume = this.max;
+                    } else
+                        this.gainControl.setValue(volume);
+                } else if (this.attention > this.meditation && this.attention > this.attentionThreshold) {
+                    System.out.println("ATTENTION**ATTENTION**ATTENTION**ATTENTION**");
+                    volume -= this.step;
+                    if (volume <= this.min) {
+                        this.gainControl.setValue(this.min);
+                        volume = this.min;
+                    } else
+                        this.gainControl.setValue(volume);
                 }
-                System.out.println("VOLUME: " + this.gainControl.getValue());
-                try {
-                    Thread.sleep(this.threadDelay);
-                } catch (InterruptedException e) {
-                    this.getStackTrace();
-                } catch (Exception e) {
-                    this.getStackTrace();
-                }
+            }
+            System.out.println("VOLUME: " + this.gainControl.getValue());
+            try {
+                Thread.sleep(this.threadDelay);
+            } catch (InterruptedException e) {
+                this.getStackTrace();
+            } catch (Exception e) {
+                this.getStackTrace();
             }
         }
     }
